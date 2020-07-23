@@ -1,0 +1,35 @@
+<mat-card>
+  <form #postForm="ngForm">
+    <mat-form-field>
+      <mat-label>Title</mat-label>
+      <input
+        matInput
+        placeholder="Title...."
+        name="title"
+        ngModel
+        autocomplete="off"
+        required
+      />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>How are you feeling now ?</mat-label>
+      <textarea
+        matInput
+        placeholder="Ex. Feeling happy...."
+        name="content"
+        ngModel
+        autocomplete="off"
+        required
+      ></textarea>
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="onAddPost(postForm)"
+    >
+      Save Post
+    </button>
+  </form>
+</mat-card>
