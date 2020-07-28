@@ -1,10 +1,15 @@
-<mat-toolbar color="primary" class="mat-elevation-z5">My App</mat-toolbar>
+<mat-toolbar color="primary" class="mat-elevation-z5"
+  >My App
+  <span class="spacer"></span>
+  <button mat-button routerLink="/create" routerLinkActive="mat-accent">
+    Create Post
+  </button>
+  <button mat-button routerLink="/posts" routerLinkActive="mat-accent">My Posts</button>
+</mat-toolbar>
 <!-- <main>
   <app-create-post (postCreated)="onPostCreated($event)"></app-create-post>
   <app-post-list [posts]="posts"></app-post-list>
 </main> -->
-
 <main>
-  <app-create-post></app-create-post>
-  <app-post-list></app-post-list>
+  <router-outlet></router-outlet>
 </main>
