@@ -1,7 +1,10 @@
-<p *ngIf="isLoading">
-  <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
-</p>
-<mat-accordion *ngIf="posts.length > 0 && !isLoading">
+<mat-progress-bar
+  *ngIf="isLoading"
+  mode="indeterminate"
+  color="accent"
+></mat-progress-bar>
+
+<mat-accordion *ngIf="posts.length > 0">
   <mat-expansion-panel multi="true" *ngFor="let post of posts">
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -9,6 +12,9 @@
       </mat-panel-title>
       <mat-panel-description> </mat-panel-description>
     </mat-expansion-panel-header>
+    <div class="post-img">
+      <img [src]="post.imagePath" [alt]="post.title" class="mat-elevation-z5" />
+    </div>
     <p>{{ post.content }}</p>
     <mat-action-row>
       <button
@@ -24,6 +30,14 @@
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
+<mat-card class="mat-elevation-z2" *ngIf="posts.length > 0">
+  <mat-paginator
+    [length]="totalPostsCount"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChanged($event)"
+  ></mat-paginator>
+</mat-card>
 
 <p *ngIf="posts.length === 0 && !isLoading" class="mat-body-strong">
   No posts added yet...

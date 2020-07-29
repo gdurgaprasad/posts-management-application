@@ -1,6 +1,44 @@
 mat-card {
+  padding: 0;
   margin-bottom: 1rem;
 }
-form > mat-form-field {
+mat-form-field {
   width: 100%;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.flex-child-1 {
+  width: 75%;
+}
+
+.flex-child-2 {
+  width: 25%;
+}
+
+input[type="file"] {
+  visibility: hidden;
+}
+
+.img-preview {
+  height: 6.5rem;
+  img {
+    width: 50%;
+    height: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  margin-bottom: 0.5rem;
+}
+
+.card-header {
+  background-color: #3f51b5;
+  color: #ffffff;
+  padding: 0.75rem;
+  justify-content: center;
+  font-size: large;
+  font-weight: 500;
 }

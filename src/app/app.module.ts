@@ -8,9 +8,11 @@ import { SharedModule } from "./shared/shared.module";
 import { CreatePostComponent } from "./pages/create-post/create-post.component";
 import { PostListComponent } from "./pages/post-list/post-list.component";
 import { HttpClientModule } from "@angular/common/http";
+import { LoginComponent } from './pages/login/login.component';
+import { SignupComponent } from './pages/signup/signup.component';
 
 @NgModule({
-  declarations: [AppComponent, CreatePostComponent, PostListComponent],
+  declarations: [AppComponent, CreatePostComponent, PostListComponent, LoginComponent, SignupComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

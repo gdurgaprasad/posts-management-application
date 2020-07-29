@@ -1,42 +1,98 @@
 const express = require("express");
+const multer = require("multer");
 const Post = require("../models/post");
 
 const router = express.Router();
 
-router.post("", (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-  });
-  post.save().then((result) => {
-    res.status(201).json({
-      message: "post created successfully.",
-      postId: result._id,
-    });
-  });
+const MIME_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+};
+
+const storage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    const isValid = MIME_TYPE_MAP[file.mimetype];
+    let error = new Error("INVALID MIME TYPE");
+    if (isValid) {
+      error = null;
+    }
+    callback(error, "backend/images");
+  },
+  filename: (req, file, callback) => {
+    const name = file.originalname.toLowerCase().split(" ").join("-");
+    const extension = MIME_TYPE_MAP[file.mimetype];
+    callback(null, `${name}-${Date.now()}.${extension}`);
+  },
 });
 
-router.put("/:postId", (req, res, next) => {
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.content,
-  });
-  Post.updateOne({ _id: req.body.id }, post).then((result) => {
-    res.status(201).json({
-      message: "post updated successfully.",
-      postId: result._id,
+router.post(
+  "",
+  multer({ storage: storage }).single("image"),
+  (req, res, next) => {
+    const url = `${req.protocol}://${req.get("host")}`;
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: `${url}/images/${req.file.filename}`,
     });
-  });
-});
+    post.save().then((createdPost) => {
+      res.status(201).json({
+        message: "post created successfully.",
+        post: {
+          ...createdPost,
+          id: createdPost._id,
+        },
+      });
+    });
+  }
+);
+
+router.put(
+  "/:postId",
+  multer({ storage: storage }).single("image"),
+  (req, res, next) => {
+    let imagePath = req.body.imagePath;
+    if (req.file) {
+      const url = `${req.protocol}://${req.get("host")}`;
+      imagePath = `${url}/images/${req.file.filename}`;
+    }
+    const post = new Post({
+      _id: req.body.id,
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: imagePath,
+    });
+    Post.updateOne({ _id: req.body.id }, post).then((result) => {
+      res.status(201).json({
+        message: "post updated successfully.",
+        postId: result._id,
+      });
+    });
+  }
+);
 
 router.get("", (req, res, next) => {
-  Post.find().then((posts) => {
-    res.status(200).json({
-      message: "Posts fetched successfully.",
-      posts,
+  const pageSize = +req.query.pageSize;
+  const currentPage = +req.query.currentPage;
+  let fetchedPosts;
+
+  const postQuery = Post.find();
+  if (pageSize && currentPage) {
+    postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+  }
+  postQuery
+    .then((documents) => {
+      fetchedPosts = documents;
+      return Post.countDocuments();
+    })
+    .then((totalPostsCount) => {
+      res.status(200).json({
+        message: "Posts fetched successfully.",
+        posts: fetchedPosts,
+        totalPostsCount,
+      });
     });
-  });
 });
 
 router.get("/:postId", (req, res, next) => {

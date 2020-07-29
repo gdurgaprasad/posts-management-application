@@ -1,41 +1,69 @@
 <mat-card>
-  <form #postForm="ngForm" (ngSubmit)="onAddPost(postForm)">
-    <mat-form-field>
-      <mat-label>Title</mat-label>
-      <input
-        matInput
-        placeholder="Title...."
-        name="title"
-        [ngModel]="post?.title"
-        autofocus
-        autocomplete="off"
-        required
-      />
-    </mat-form-field>
+  <mat-card-header class="card-header">CREATE POST</mat-card-header>
+  <form [formGroup]="form" class="p-2" (ngSubmit)="onSavePost()">
+    <div class="flex-container">
+      <div class="flex-child-1">
+        <mat-form-field>
+          <mat-label>Title</mat-label>
+          <input
+            matInput
+            placeholder="Title...."
+            formControlName="title"
+            autofocus
+            autocomplete="off"
+            required
+          />
+        </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>How are you feeling now ?</mat-label>
-      <textarea
-        matInput
-        placeholder="Ex. Feeling happy...."
-        name="content"
-        [ngModel]="post?.content"
-        autocomplete="off"
-        required
-      ></textarea>
-    </mat-form-field>
+        <mat-form-field>
+          <mat-label>How are you feeling now ?</mat-label>
+          <textarea
+            matInput
+            placeholder="Ex. Feeling happy...."
+            formControlName="content"
+            autocomplete="off"
+            required
+          ></textarea>
+        </mat-form-field>
+      </div>
+      <div class="flex-child-2">
+        <div class="img-preview">
+          <img
+            *ngIf="selectedImage"
+            [src]="selectedImage"
+            [alt]="form.value.title"
+          />
+        </div>
+        <button
+          mat-stroked-button
+          type="button"
+          color="accent"
+          (click)="filePicker.click()"
+        >
+          Pick Image
+        </button>
+        <input
+          type="file"
+          #filePicker
+          accept="image/jpg, image/jpeg, image/png"
+          (change)="onImageSelected($event)"
+        />
+      </div>
+    </div>
+
     <mat-progress-bar
       *ngIf="isLoading"
       mode="indeterminate"
+      class="mb-1"
       color="accent"
     ></mat-progress-bar>
 
     <button
       mat-raised-button
       color="accent"
-      [disabled]="postForm.invalid || isLoading"
+      [disabled]="form.invalid || isLoading"
     >
-      Save Post
+      {{ mode === "create" ? "SAVE POST" : "UPDATE POST" }}
     </button>
   </form>
 </mat-card>

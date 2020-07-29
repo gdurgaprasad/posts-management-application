@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
-import { Post } from "../models/post.model";
+import { Post, PostResponse } from "../models/post.model";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
 import { map } from "rxjs/operators";
@@ -11,27 +11,36 @@ import { Router } from "@angular/router";
 })
 export class PostService {
   private posts: Post[] = [];
-  private updatedPosts = new Subject<Post[]>();
+  private updatedPosts = new Subject<PostResponse>();
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  getPosts() {
+  getPosts(pageSize: number, currentPage: number) {
     this.http
-      .get<{ message: string; posts: any }>(`${environment.host}/posts`)
+      .get<{ message: string; posts: any; totalPostsCount: number }>(
+        `${environment.host}/posts?pageSize=${pageSize}&currentPage=${currentPage}`
+      )
       .pipe(
         map((postsData) => {
-          return postsData.posts.map((post) => {
-            return {
-              id: post._id,
-              title: post.title,
-              content: post.content,
-            };
-          });
+          return {
+            posts: postsData.posts.map((post) => {
+              return {
+                id: post._id,
+                title: post.title,
+                content: post.content,
+                imagePath: post.imagePath,
+              };
+            }),
+            totalPostsCount: postsData.totalPostsCount,
+          };
         })
       )
       .subscribe((response) => {
-        this.posts = response;
-        this.updatedPosts.next([...this.posts]);
+        this.posts = response.posts;
+        this.updatedPosts.next({
+          posts: [...this.posts],
+          totalPostsCount: response.totalPostsCount,
+        });
       });
   }
 
@@ -43,34 +52,42 @@ export class PostService {
     return this.updatedPosts.asObservable();
   }
 
-  onPostAdded(post: Post) {
+  onPostAdded(title: string, content: string, image: File) {
+    const postData = new FormData();
+    postData.append("title", title);
+    postData.append("content", content);
+    postData.append("image", image);
     this.http
-      .post<{ message: string; postId: string }>(
+      .post<{ message: string; post: Post }>(
         `${environment.host}/posts`,
-        post
+        postData
       )
-      .subscribe((postData) => {
-        post.id = postData.postId;
-        this.posts.push(post);
-        this.updatedPosts.next([...this.posts]);
+      .subscribe(() => {
         this.router.navigate(["/posts"]);
       });
   }
 
   deletePost(postId: string) {
-    return this.http
-      .delete<{ message: string }>(`${environment.host}/posts/${postId}`)
-      .subscribe((data) => {
-        const updatedPosts = this.posts.filter((post) => post.id !== postId);
-        this.posts = [...updatedPosts];
-        this.updatedPosts.next([...this.posts]);
-      });
+    return this.http.delete<{ message: string }>(
+      `${environment.host}/posts/${postId}`
+    );
   }
 
   updatePost(post: Post) {
+    const { image } = post;
+    let postData: Post | FormData;
+    if (typeof image === "object") {
+      postData = new FormData();
+      postData.append("id", post.id);
+      postData.append("title", post.title);
+      postData.append("content", post.content);
+      postData.append("image", image);
+    } else {
+      postData = post;
+    }
     return this.http.put<{ message: string; postId: string }>(
       `${environment.host}/posts/${post.id}`,
-      post
+      postData
     );
   }
 
