@@ -1,17 +1,44 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
-import { PostListComponent } from "./pages/post-list/post-list.component";
-import { CreatePostComponent } from "./pages/create-post/create-post.component";
-import { SignupComponent } from "./pages/signup/signup.component";
-import { LoginComponent } from "./pages/login/login.component";
+import { AuthenticationGuard } from "./shared/guards/authentication.guard";
+import { PublicHomeComponent } from "./public-pages/public-home.component";
+import { LoginComponent } from "./public-pages/login/login.component";
+import { PostListComponent } from "./public-pages/post-list/post-list.component";
+import { ProtectedHomeComponent } from "./protected-pages/protected-home.component";
+import { SignupComponent } from "./public-pages/signup/signup.component";
 
 const routes: Routes = [
-  { path: "", redirectTo: "posts", pathMatch: "full" },
-  { path: "signup", component: SignupComponent },
-  { path: "login", component: LoginComponent },
-  { path: "posts", component: PostListComponent },
-  { path: "create", component: CreatePostComponent },
-  { path: "edit/:postId", component: CreatePostComponent },
+  {
+    path: "",
+    component: ProtectedHomeComponent,
+    canActivate: [AuthenticationGuard],
+    children: [
+      {
+        path: "posts",
+        loadChildren: () =>
+          import("./protected-pages/post-list/post-list.module").then(
+            (m) => m.PostListModule
+          ),
+      },
+      {
+        path: "create",
+        loadChildren: () =>
+          import("./protected-pages/create-post/create-post.module").then(
+            (m) => m.CreatePostModule
+          ),
+      },
+    ],
+  },
+  {
+    path: "public",
+    component: PublicHomeComponent,
+    children: [
+      { path: "", component: LoginComponent },
+      { path: "login", component: LoginComponent },
+      { path: "signup", component: SignupComponent },
+      { path: "public-posts", component: PostListComponent },
+    ],
+  },
 ];
 
 @NgModule({

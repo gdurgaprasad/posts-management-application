@@ -11,6 +11,17 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+main {
+  width: 80%;
+  margin: auto;
+  text-align: center;
+  padding: 1rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
 .mb-1 {
   margin-bottom: 3px;
 }

@@ -1,0 +1,20 @@
+<mat-toolbar color="primary" class="mat-elevation-z5"
+  >My App
+  <span class="spacer"></span>
+  <button
+    mat-button
+    routerLink="/public/public-posts"
+    routerLinkActive="mat-accent"
+  >
+    Posts
+  </button>
+  <button mat-button routerLink="/public/login" routerLinkActive="mat-accent">
+    Login
+  </button>
+  <button mat-button routerLink="/public/signup" routerLinkActive="mat-accent">
+    Sign Up
+  </button>
+</mat-toolbar>
+<main>
+  <router-outlet></router-outlet>
+</main>

@@ -4,6 +4,7 @@ export interface Post {
   content: string;
   imagePath?: string;
   image?: File;
+  creator?: string;
 }
 
 export interface PostResponse {

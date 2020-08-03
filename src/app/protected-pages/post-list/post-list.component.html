@@ -16,11 +16,11 @@
       <img [src]="post.imagePath" [alt]="post.title" class="mat-elevation-z5" />
     </div>
     <p>{{ post.content }}</p>
-    <mat-action-row>
+    <mat-action-row *ngIf="post.creator === currentUserId">
       <button
         mat-stroked-button
         color="primary"
-        [routerLink]="['/edit', post.id]"
+        [routerLink]="['/create/edit', post.id]"
       >
         EDIT
       </button>

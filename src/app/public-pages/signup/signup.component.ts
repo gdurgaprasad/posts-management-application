@@ -1,6 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { UserService } from "src/app/shared/services/user.service";
+import { Router } from "@angular/router";
+import {
+  PAGES,
+  RESPONSES,
+  SNACKBAR_MESSAGES,
+} from "src/app/shared/utils/constant";
+import { SnackbarService } from "src/app/shared/services/snackbar.service";
 
 @Component({
   selector: "app-signup",
@@ -11,7 +18,11 @@ export class SignupComponent implements OnInit {
   isLoading = false;
   form: FormGroup;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private snackbar: SnackbarService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.form = new FormGroup({
@@ -22,18 +33,21 @@ export class SignupComponent implements OnInit {
     });
   }
 
-  onSignup() {
+  onSignup(): void {
     this.isLoading = true;
     this.userService
       .createUser(this.form.value.email, this.form.value.password)
       .subscribe(
-        (createdUser) => {
+        () => {
+          this.snackbar.show(
+            SNACKBAR_MESSAGES.SIGNUP_SUCCESS,
+            RESPONSES.SUCCESS
+          );
           this.isLoading = false;
-          console.log(createdUser);
+          this.router.navigate([PAGES.LOGIN]);
         },
-        (err) => {
-          const errorMessage = err.error;
-          console.log(errorMessage.error.message);
+        (error) => {
+          this.snackbar.show(error, RESPONSES.FAILED);
           this.isLoading = false;
         }
       );
