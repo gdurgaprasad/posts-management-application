@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  host: "http://localhost:3000/api",
+  host: "https://famous-strong-manta.glitch.me/api",
 };
